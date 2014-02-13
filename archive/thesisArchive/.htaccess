@@ -1,4 +1,0 @@
-AuthUserFile /home/curran/.htpasswd
-AuthType Basic
-AuthName "Private Research Directory"
-Require valid-user
