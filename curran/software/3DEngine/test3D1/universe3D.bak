@@ -1,0 +1,87 @@
+//import java.awt.*;
+public class universe3D
+{
+	window2D screen;
+	object3D[] objects;
+	double Zdist = 30; //the observer distance away from the origin
+	double zoom = 0;
+	
+	public universe3D(window2D s)
+	{
+		screen = s;
+		objects = new object3D[1];
+		point3D[] Ps = {new point3D(0,0,0),new point3D(5,0,0),new point3D(0,5,0)};
+		objects[0] = new object3D(Ps,Color.black);
+	}
+	public void displayWireframe(Graphics2D g,rotationInstance ROTATION)
+	{
+		g.clearRect(0,0,screen.width,screen.height);
+		
+		point3D[] pnts;
+		object3D[] rotatedObjects = new object3D[objects.length];
+		for(int o = 0; o<objects.length;o++)//for every object
+		{
+			pnts = objects[o].getPoint3DArray();
+			point3D[] temppnts = new point3D[pnts.length];
+			for(int p = 0; p<pnts.length;p++)//for every point of every object
+			{
+				temppnts[p] = ROTATION.getRotatedPoint3D(pnts[p]);//rotate each point of each object
+			}
+			rotatedObjects[o] = new object3D(temppnts,objects[o].getColor());
+		}
+		//insert sort here
+		
+		for(int i = 0; i<rotatedObjects.length;i++)//for every rotated object
+		{
+			point3D[] ROTpnts = rotatedObjects[i].getPoint3DArray();
+			int[] Xs = new int[ROTpnts.length];
+			int[] Ys = new int[ROTpnts.length];
+			for(int p = 0; p<ROTpnts.length;p++)//for every point of every object
+			{
+				double denom = ROTpnts[p].getZ()+Zdist;
+				Xs[p] = screen.getXpixel(zoom*ROTpnts[p].getX()/denom);
+				Ys[p] = screen.getYpixel(zoom*ROTpnts[p].getY()/denom);
+			}
+			g.setColor(rotatedObjects[i].getColor());
+			g.drawPolygon(Xs,Ys,Ys.length);
+		}
+	}
+}
+
+class rotationInstance
+{
+	double a,b,c,d,e,f,g,h,i,newX,newY,newZ,x,y,z;
+	public rotationInstance(double Xrot, double Yrot,double Zrot)
+	{
+		double s1 = Math.sin(Yrot);
+		double s2 = Math.sin(Zrot);
+		double s3 = Math.sin(Xrot);
+		double c1 = Math.cos(Yrot);
+		double c2 = Math.cos(Zrot);
+		double c3 = Math.cos(Xrot);
+
+		//newX = x(s1s2s3 + c1c3) + y(c2s3) + z(c1s2s3 - c3s1)
+		//newY = x(c3s1s2 - c1s3) + y(c2c3) + z(c1c3s2 + s1s3)
+		//newZ = x(c1s2s3 - c3s1) + y(-s2)  + z(c1c2)
+		
+		a = s1*s2*s3 + c1*c3;
+		b = c2*s3;
+		c = c1*s2*s3 - c3*s1;
+		d = c3*s1*s2 - c1*s3;
+		e = c2*c3;
+		f = c1*c3*s2 + s1*s3;
+		g = c1*s2*s3 - c3*s1;
+		h = -s2;
+		i = c1*c2;
+	}
+	public point3D getRotatedPoint3D(point3D p)
+	{
+		x = p.getX();
+		y = p.getY();
+		z = p.getZ();
+		newX = x*a + y*b + z*c;
+		newY = x*d + y*e + z*f;
+		newZ = x*g + y*h + z*i;
+		return new point3D(newX,newY,newZ);
+	}
+}

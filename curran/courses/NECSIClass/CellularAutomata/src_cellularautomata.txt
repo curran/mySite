@@ -1,0 +1,4 @@
+C:\Java\CellularAutomata\CellularAutomata\src\CAApplet.java
+C:\Java\CellularAutomata\CellularAutomata\src\Cell.java
+C:\Java\CellularAutomata\CellularAutomata\src\CellularAutomata.java
+C:\Java\CellularAutomata\CellularAutomata\src\Parameters.java
